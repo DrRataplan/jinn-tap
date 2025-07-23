@@ -1,5 +1,5 @@
 import { parseXml } from './util';
-import { registerXQueryModule, evaluateXPathToNodes, evaluateXPath, evaluateXPathToFirstNode } from "fontoxpath";
+import { registerXQueryModule, evaluateXPathToNodes, evaluateXPath, evaluateXPathToFirstNode } from 'fontoxpath';
 
 registerXQueryModule(`
     xquery version "3.1";
@@ -82,7 +82,7 @@ registerXQueryModule(`
     declare function jt:export($nodes as node()*, $input as document-node(), $meta as map(*)) {
         for $node in $nodes
         return
-            typeswitch($node => trace("AAA"||name($node)))
+            typeswitch($node)
                 case document-node() return
                     jt:export($node/node(), $input, $meta)
                 case element(tei:TEI) return
@@ -118,7 +118,7 @@ registerXQueryModule(`
                             jt:export($node/node(), $input, $meta)
                     }
                 case element(tei:cell) return
-                    element { node-name($node) => trace('AAA')} {
+                    element { node-name($node)} {
                         (: Filter out rowspan and colspan. They are added while the TEI table is an HTML table :)
                         $node/@* except $node/(@colspan, @rowspan),
                         jt:export($node/node(), $input, $meta)
@@ -148,16 +148,16 @@ export function importXml(content) {
         {
             language: evaluateXPath.XQUERY_3_1_LANGUAGE,
             // we want to create HTML, not XML nodes
-            nodesFactory: document
-        }
+            nodesFactory: document,
+        },
     );
     const xmlText = [];
-    output.forEach(node => {
+    output.forEach((node) => {
         xmlText.push(node.outerHTML);
     });
     return {
         content: xmlText.join(''),
-        doc: xmlDoc
+        doc: xmlDoc,
     };
 }
 
@@ -174,14 +174,14 @@ export function exportXml(content, xmlDoc, metadata = {}) {
         null,
         {
             document: xmlDoc,
-            meta: metadata
+            meta: metadata,
         },
         {
-            language: evaluateXPath.XQUERY_3_1_LANGUAGE
-        }
+            language: evaluateXPath.XQUERY_3_1_LANGUAGE,
+        },
     );
     const serializer = new XMLSerializer();
-    return output.map(node => serializer.serializeToString(node)).join('');
+    return output.map((node) => serializer.serializeToString(node)).join('');
 }
 
 export function createDocument() {
@@ -199,8 +199,8 @@ export function createDocument() {
         {
             language: evaluateXPath.XQUERY_3_1_LANGUAGE,
             nodesFactory: inDoc,
-            debug: true
-        }
+            debug: true,
+        },
     );
     return importXml(doc);
 }
